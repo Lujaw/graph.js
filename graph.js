@@ -14,11 +14,10 @@ function Graph(
     var rangeX = _rangeX;
     var rangeY = _rangeY;
 
-    var offset = 0.5;   // general offset when drawing to the canvas.
-
     var config = {
         markSpacingX: 1,    // draw a mark every n units on the X axis
-        markSpacingY: 1     // draw a mark every n units on the Y axis
+        markSpacingY: 1,     // draw a mark every n units on the Y axis
+        detailLevel: 5
     };
 
     var styles = {
@@ -57,18 +56,16 @@ function Graph(
 
     var context = c.getContext("2d");
 
+    // draw grid and axis
+    _clear();
+
     function _moveTo(x, y) {
-        context.moveTo(Math.round(x)+offset, Math.round(y)+offset);
+        context.moveTo(Math.round(x)+0.5, Math.round(y)+0.5);
     }
 
     function _lineTo(x, y) {
-        context.lineTo(Math.round(x)+offset, Math.round(y)+offset);
+        context.lineTo(Math.round(x)+0.5, Math.round(y)+0.5);
     }
-
-    // draw grid and axis
-    _fillBackground();
-    _drawGrid();
-    _drawAxis();
 
     function _unitsToPxX(units) {
         return units * ppuX;
@@ -185,12 +182,19 @@ function Graph(
         }
         
         context.beginPath();
+
+        var lineWidthBackup = context.lineWidth;
         context.lineWidth = 2;
 
-        for(var x = 0; x <= pxWidth; x+=5) {
+        for(var x = 0; x <= pxWidth; x+=config.detailLevel) {
 
             var ux = rangeX[0] + _pxToUnitsX(x);
             var uy = _f(ux);
+
+            if(null == uy) { // special case for animations
+                continue;
+            }
+
             var y = pxOriginY - _unitsToPxY(uy);
 
 //            console.debug(ux + " => " + uy);
@@ -203,7 +207,16 @@ function Graph(
             }
         }
         context.stroke();
+
+        context.lineWidth = lineWidthBackup;
+    }
+
+    function _clear(){
+        _fillBackground();
+        _drawGrid();
+        _drawAxis();
     }
 
     this.render = _drawFunc;
+    this.clear = _clear;
 }

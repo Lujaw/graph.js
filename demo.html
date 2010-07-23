@@ -5,37 +5,80 @@
     <script type="text/javascript" src="graph.js"></script>
 </head>
 <body>
-    <div id="main"></div>
+    <h1>graph.js examples</h1>
+    <h2>Simple graph</h2>
+    <div id="graph1"></div>
     <script type="text/javascript">
 
-        // OPTIONALLY you may pass your own styles and additional config options
-        // to the constructor.
-        var styles = {
-            "axis_x_line_color" : "#000",
-            "axis_y_line_color" : "#000"
-        };
-        var options = {
-            markSpacingX : Math.PI / 2,
-            markSpacingY : 1
-        };
-
-        // To initialize the canvas you need to provide a container (div#main
+        // To initialize the canvas you need to provide a container (div#graph1
         // here), the size of the canvas and the respective ranges for the x and
         // y axis.
-        var g = new Graph("main", 300, 150,
-            [-Math.PI*2, Math.PI*2],
-            [-1.5, 1.5],
-            options,
-            styles
+        var g = new Graph(
+            "graph1",   // id of the container
+            800,        // width of the canvas in pixels
+            160,        // height of the canvas in pixels
+            [-10, 10],  // x range [from, to]
+            [-2, 2]     // y range [from, to]
         );
 
         // You can render multiple functions in one graph. Each in a different
         // color.
         g.render(Math.sin, "#f0f");
         g.render(Math.cos, "#0f0");
+    </script>
 
-        // Well, that's pretty much it..
+    <hr />
+
+    <h2>Animated graph with different color set</h2>
+    <div id="graph2"></div>
+    <script type="text/javascript">
+
+        // OPTIONALLY you may pass your own styles and additional config options
+        // to the constructor.
+        var styles = {
+            "axis_x_line_color" : "#44f",
+            "axis_x_mark_color" : "#44f",
+            "axis_x_grid_color" : "#116",
+
+            "axis_y_line_color" : "#44f",
+            "axis_y_mark_color" : "#44f",
+            "axis_y_grid_color" : "#116",
+
+            "background_color" : "#000",
+            "curve_color" : "#fff"
+        };
+        var options = {
+            markSpacingX : 1,
+            markSpacingY : 1,
+            detailLevel: 2
+        };
+
+        var g = new Graph("graph2", 800, 160,
+            [-10, 10],
+            [-2, 2],
+            options,
+            styles
+        );
+        var z = -10;
+
+        f1 = function(x) { return Math.pow(x, 2) / 25.0 - 2.0; }
+        f2 = function(x) { return -(Math.pow(x, 2) / 25.0 - 2.0); }
+
+        function renderFrame() {
+            g.clear();
+            g.render(function(x) { return (x < z) ? f1(x) : null; }, "#0fa");
+            g.render(function(x) { return (x < z) ? f2(x) : null; }, "#0af");
+
+            if(++z > 10) {
+                z = -10;
+                clearInterval(intervalId);
+                setTimeout('intervalId = setInterval("renderFrame()", 100);', 1500);
+            }
+        }
+        // draw 10 frames per second
+        var intervalId = setInterval("renderFrame()", 100);
 
     </script>
+    <button onclick="clearInterval(intervalId);">Stop animation</button>
 </body>
 </html>
