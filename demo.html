@@ -7,7 +7,12 @@
 <body>
     <div id="main"></div>
     <script type="text/javascript">
-        var g = new Graph("main", 300, 150, Math.sin);
+        var g = new Graph("main", 600, 300,
+            [-Math.PI*2, Math.PI*2],
+            [-1.5, 1.5]
+        );
+        g.render(Math.sin, "#f0f");
+        g.render(Math.cos, "#0f0");
     </script>
 </body>
 </html>

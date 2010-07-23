@@ -1,19 +1,13 @@
-function Graph(_nodeId, _width, _height, _f) {
+
+
+function Graph(_parentNodeId, _width, _height, _rangeX, _rangeY) {
 
     var pxWidth = _width;
     var pxHeight = _height;
-    var tileSize = 10;
-    var tileFillSize = 4;
+    var rangeX = _rangeX;
+    var rangeY = _rangeY;
 
-    var f = _f;
-
-    var rangeX = [-Math.PI*2, Math.PI*2];
-    var rangeY = [-2, 2];
-
-//    var rangeX = [-5000, 10000];
-//    var rangeY = [-5090, 10000];
-
-    var parentNodeId = _nodeId;
+    var parentNodeId = _parentNodeId;
 
     var unitsX = Math.abs(rangeX[0]) + Math.abs(rangeX[1]);
     var unitsY = Math.abs(rangeY[0]) + Math.abs(rangeY[1]);
@@ -50,8 +44,6 @@ function Graph(_nodeId, _width, _height, _f) {
 
     _fillBackground();
     _drawAxis();
-    _drawFunc();
-
 
     function _unitsToPxX(units) {
         return units * ppuX;
@@ -157,24 +149,34 @@ function Graph(_nodeId, _width, _height, _f) {
         context.fill();
     }
 
-    function _drawFunc() {
+    function _drawFunc(_f, color) {
 
-        context.strokeStyle = styles["curve_color"];
+        if(color) {
+            context.strokeStyle = color;
+        } else {
+            context.strokeStyle = styles["curve_color"];
+        }
+        
         context.beginPath();
-        context.moveTo(0, 0);
         context.lineWidth = 2;
 
         for(var x = 0; x <= pxWidth; x+=5) {
 
             var ux = rangeX[0] + _pxToUnitsX(x);
-            var uy = f(ux);
+            var uy = _f(ux);
             var y = pxOriginY - _unitsToPxY(uy);
 
-            console.debug(ux + " => " + uy);
-            console.debug(x + "px => " + y + "px");
+//            console.debug(ux + " => " + uy);
+//            console.debug(x + "px => " + y + "px");
 
-            context.lineTo(x, y);
+            if(0 == x) {
+                context.moveTo(x, y);
+            } else {
+                context.lineTo(x, y);
+            }
         }
         context.stroke();
     }
+
+    this.render = _drawFunc;
 }
