@@ -7,12 +7,35 @@
 <body>
     <div id="main"></div>
     <script type="text/javascript">
-        var g = new Graph("main", 600, 300,
+
+        // OPTIONALLY you may pass your own styles and additional config options
+        // to the constructor.
+        var styles = {
+            "axis_x_line_color" : "#000",
+            "axis_y_line_color" : "#000"
+        };
+        var options = {
+            markSpacingX : Math.PI / 2,
+            markSpacingY : 1
+        };
+
+        // To initialize the canvas you need to provide a container (div#main
+        // here), the size of the canvas and the respective ranges for the x and
+        // y axis.
+        var g = new Graph("main", 300, 150,
             [-Math.PI*2, Math.PI*2],
-            [-1.5, 1.5]
+            [-1.5, 1.5],
+            options,
+            styles
         );
+
+        // You can render multiple functions in one graph. Each in a different
+        // color.
         g.render(Math.sin, "#f0f");
         g.render(Math.cos, "#0f0");
+
+        // Well, that's pretty much it..
+
     </script>
 </body>
 </html>

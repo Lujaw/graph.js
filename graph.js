@@ -1,25 +1,23 @@
 
+function Graph(
+    _parentNodeId,
+    _width,
+    _height,
+    _rangeX,
+    _rangeY,
+    _config,
+    _styles) {
 
-function Graph(_parentNodeId, _width, _height, _rangeX, _rangeY) {
-
+    var parentNodeId = _parentNodeId;
     var pxWidth = _width;
     var pxHeight = _height;
     var rangeX = _rangeX;
     var rangeY = _rangeY;
 
-    var parentNodeId = _parentNodeId;
-
-    var unitsX = Math.abs(rangeX[0]) + Math.abs(rangeX[1]);
-    var unitsY = Math.abs(rangeY[0]) + Math.abs(rangeY[1]);
-
-    var ppuX = pxWidth / unitsX; // pixels per unit
-    var ppuY = pxHeight / unitsY; // pixels per unit
-
-    var pxOriginX = Math.abs(rangeX[0]) * ppuX;
-    var pxOriginY = Math.abs(rangeY[1]) * ppuY;
-
-    var markSpacingX = 1; // draw a mark every 10 units
-    var markSpacingY = 1; // draw a mark every 10 units
+    var config = {
+        markSpacingX: 1,    // draw a mark every n units on the X axis
+        markSpacingY: 1     // draw a mark every n units on the Y axis
+    };
 
     var styles = {
         "axis_x_line_color" : "#f00",
@@ -34,6 +32,21 @@ function Graph(_parentNodeId, _width, _height, _rangeX, _rangeY) {
         "curve_color" : "#000"
     };
 
+    // merge user config and styles
+    for(attr in _config) { config[attr] = _config[attr] };
+    for(attr in _styles) { styles[attr] = _styles[attr] };
+
+    // precalculate some values for convinience
+    var unitsX = Math.abs(rangeX[0]) + Math.abs(rangeX[1]);
+    var unitsY = Math.abs(rangeY[0]) + Math.abs(rangeY[1]);
+
+    var ppuX = pxWidth / unitsX; // pixels per unit
+    var ppuY = pxHeight / unitsY; // pixels per unit
+
+    var pxOriginX = Math.abs(rangeX[0]) * ppuX;
+    var pxOriginY = Math.abs(rangeY[1]) * ppuY;
+
+    // create canvas node
     var mainNode = document.getElementById(parentNodeId);
     var c = document.createElement("canvas");
     c.setAttribute("width", pxWidth);
@@ -42,6 +55,7 @@ function Graph(_parentNodeId, _width, _height, _rangeX, _rangeY) {
 
     var context = c.getContext("2d");
 
+    // draw grid and axis
     _fillBackground();
     _drawAxis();
 
@@ -74,8 +88,8 @@ function Graph(_parentNodeId, _width, _height, _rangeX, _rangeY) {
     function _drawAxisX() {
 
         // draw marks and grid
-        var psmx = _unitsToPxX(markSpacingX)
-        var pxStart = _unitsToPxX( Math.abs(rangeX[0]) % markSpacingX );
+        var psmx = _unitsToPxX(config.markSpacingX)
+        var pxStart = _unitsToPxX( Math.abs(rangeX[0]) % config.markSpacingX );
         var pxEnd = pxWidth;
 
         for(var x = pxStart; x <= pxEnd; x+=psmx) {
@@ -113,8 +127,8 @@ function Graph(_parentNodeId, _width, _height, _rangeX, _rangeY) {
     function _drawAxisY() {
 
         // draw marks and grid
-        var psmy = _unitsToPxY(markSpacingY)
-        var pxStart = _unitsToPxY( Math.abs(rangeY[1]) % markSpacingY );
+        var psmy = _unitsToPxY(config.markSpacingY)
+        var pxStart = _unitsToPxY( Math.abs(rangeY[1]) % config.markSpacingY );
         var pxEnd = pxHeight;
 
         for(var y = pxStart; y <= pxEnd; y+=psmy) {
