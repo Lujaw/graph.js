@@ -14,6 +14,8 @@ function Graph(
     var rangeX = _rangeX;
     var rangeY = _rangeY;
 
+    var offset = 0.5;   // general offset when drawing to the canvas.
+
     var config = {
         markSpacingX: 1,    // draw a mark every n units on the X axis
         markSpacingY: 1     // draw a mark every n units on the Y axis
@@ -55,8 +57,17 @@ function Graph(
 
     var context = c.getContext("2d");
 
+    function _moveTo(x, y) {
+        context.moveTo(Math.round(x)+offset, Math.round(y)+offset);
+    }
+
+    function _lineTo(x, y) {
+        context.lineTo(Math.round(x)+offset, Math.round(y)+offset);
+    }
+
     // draw grid and axis
     _fillBackground();
+    _drawGrid();
     _drawAxis();
 
     function _unitsToPxX(units) {
@@ -85,8 +96,7 @@ function Graph(
         _drawAxisY();
     }
 
-    function _drawAxisX() {
-
+    function _drawGrid() {
         // draw marks and grid
         var psmx = _unitsToPxX(config.markSpacingX)
         var pxStart = _unitsToPxX( Math.abs(rangeX[0]) % config.markSpacingX );
@@ -96,35 +106,16 @@ function Graph(
 
             context.strokeStyle = styles["axis_x_grid_color"];
             context.beginPath();
-            context.moveTo(x, 0);
-            context.lineTo(x, pxHeight);
+            _moveTo(x, 0);
+            _lineTo(x, pxHeight);
             context.stroke();
 
             context.strokeStyle = styles["axis_x_mark_color"];
             context.beginPath();
-            context.moveTo(x, pxOriginY - 3);
-            context.lineTo(x, pxOriginY + 3);
+            _moveTo(x, pxOriginY - 3);
+            _lineTo(x, pxOriginY + 3);
             context.stroke();
         }
-
-        // draw x axis
-        context.beginPath();
-        context.strokeStyle = styles["axis_x_line_color"];
-        context.moveTo(0, pxOriginY);
-        context.lineTo(pxWidth, pxOriginY);
-        context.stroke();
-
-        // draw x axis arrow
-        context.beginPath();
-        context.fillStyle = styles["axis_x_line_color"];
-        context.moveTo(pxWidth, pxOriginY);
-        context.lineTo(pxWidth - 10, pxOriginY - 5);
-        context.lineTo(pxWidth - 5, pxOriginY);
-        context.lineTo(pxWidth - 10, pxOriginY + 5);
-        context.fill();
-    }
-
-    function _drawAxisY() {
 
         // draw marks and grid
         var psmy = _unitsToPxY(config.markSpacingY)
@@ -135,31 +126,53 @@ function Graph(
 
             context.strokeStyle = styles["axis_y_grid_color"];
             context.beginPath();
-            context.moveTo(0, y);
-            context.lineTo(pxWidth, y);
+            _moveTo(0, y);
+            _lineTo(pxWidth, y);
             context.stroke();
 
             context.strokeStyle = styles["axis_y_mark_color"];
             context.beginPath();
-            context.moveTo(pxOriginX-3, y);
-            context.lineTo(pxOriginX+3, y);
+            _moveTo(pxOriginX-3, y);
+            _lineTo(pxOriginX+3, y);
             context.stroke();
         }
+    }
+
+    function _drawAxisX() {
+
+        // draw x axis
+        context.beginPath();
+        context.strokeStyle = styles["axis_x_line_color"];
+        _moveTo(0, pxOriginY);
+        _lineTo(pxWidth, pxOriginY);
+        context.stroke();
+
+        // draw x axis arrow
+        context.beginPath();
+        context.fillStyle = styles["axis_x_line_color"];
+        _moveTo(pxWidth, pxOriginY);
+        _lineTo(pxWidth - 10, pxOriginY - 5);
+        _lineTo(pxWidth - 5, pxOriginY);
+        _lineTo(pxWidth - 10, pxOriginY + 5);
+        context.fill();
+    }
+
+    function _drawAxisY() {
 
         // draw y axis
         context.beginPath();
         context.strokeStyle = styles["axis_y_line_color"];
-        context.moveTo(pxOriginX, 0);
-        context.lineTo(pxOriginX, pxHeight);
+        _moveTo(pxOriginX, 0);
+        _lineTo(pxOriginX, pxHeight);
         context.stroke();
 
         // draw y axis arrow
         context.beginPath();
         context.fillStyle = styles["axis_y_line_color"];
-        context.moveTo(pxOriginX, 0);
-        context.lineTo(pxOriginX - 5, 10);
-        context.lineTo(pxOriginX, 5);
-        context.lineTo(pxOriginX + 5, 10);
+        _moveTo(pxOriginX, 0);
+        _lineTo(pxOriginX - 5, 10);
+        _lineTo(pxOriginX, 5);
+        _lineTo(pxOriginX + 5, 10);
         context.fill();
     }
 
@@ -184,9 +197,9 @@ function Graph(
 //            console.debug(x + "px => " + y + "px");
 
             if(0 == x) {
-                context.moveTo(x, y);
+                _moveTo(x, y);
             } else {
-                context.lineTo(x, y);
+                _lineTo(x, y);
             }
         }
         context.stroke();
